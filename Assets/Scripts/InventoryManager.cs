@@ -9,6 +9,8 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject slotPrefab; // Prefab per ogni slot
     [SerializeField] private Transform slotsParent; // Il container degli slot (es: Grid Layout Group)
+    [Header("UI References")]
+    [SerializeField] private Image equippedItemImage; // Riferimento all'immagine UI dell'oggetto equipaggiato
     
     private List<CollectibleItem> collectedItems = new List<CollectibleItem>();
     private List<InventorySlot> inventorySlots = new List<InventorySlot>();
@@ -33,6 +35,12 @@ public class InventoryManager : MonoBehaviour
         if (inventoryUI != null)
         {
             inventoryUI.SetActive(false);
+        }
+
+        // Inizializza l'immagine dell'oggetto equipaggiato
+        if (equippedItemImage != null)
+        {
+            equippedItemImage.enabled = false;
         }
     }
 
@@ -114,6 +122,13 @@ public class InventoryManager : MonoBehaviour
         equippedItem = item;
         currentItemIndex = collectedItems.IndexOf(item);
         item.EquipItem();
+        
+        // Aggiorna l'immagine dell'oggetto equipaggiato
+        if (equippedItemImage != null)
+        {
+            equippedItemImage.sprite = item.ItemIcon;
+            equippedItemImage.enabled = true;
+        }
         
         Debug.Log($"Equipaggiato: {item.ItemName}");
     }
