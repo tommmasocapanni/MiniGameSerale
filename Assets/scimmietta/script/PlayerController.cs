@@ -158,10 +158,11 @@ public class PlayerController : MonoBehaviour
         cameraTransform.LookAt(transform.position + Vector3.up * cameraHeightOffset); // Look at the center of the character's back
 
         // Check for interaction with car
-        if (nearCar && Input.GetKeyDown(KeyCode.E))
+        if (nearCar && Input.GetKeyDown(KeyCode.E) && !isInCar)  // Aggiunto check !isInCar
         {
             if (car != null)
             {
+                Debug.Log("Attempting to enter car");
                 StartCoroutine(EnterCarCoroutine());
             }
             else
@@ -233,9 +234,9 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Car"))
         {
+            Debug.Log("Player entered car trigger");
             nearCar = true;
             car = other.gameObject;
-            Debug.Log("Near car: " + car.name); // Debug log
         }
 
         if (other.CompareTag("UFO"))
@@ -252,9 +253,12 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Car"))
         {
-            nearCar = false;
-            car = null;
-            Debug.Log("Car out of range");
+            if (!isInCar)  // Solo se non siamo dentro la macchina
+            {
+                Debug.Log("Player exited car trigger");
+                nearCar = false;
+                car = null;
+            }
         }
 
         if (other.CompareTag("UFO"))
@@ -295,13 +299,15 @@ public class PlayerController : MonoBehaviour
             isInCar = true;
             Debug.Log("Starting car enter sequence");
             
-            // Disattiva temporaneamente lo script del player
+            // Prima disattiva i controlli
             enabled = false;
             rb.isKinematic = true;
             
-            // Attiva l'animazione
-            animator.SetTrigger("enterCar");
-            yield return new WaitForSeconds(1.0f);
+            // Attiva l'animazione prima di entrare nella macchina
+            animator.SetBool("isDriving", true);
+            
+            // Aspetta che l'animazione si avvii
+            yield return new WaitForSeconds(0.1f);
             
             // Entra nella macchina
             carController.EnterCar(this);
@@ -383,6 +389,9 @@ public class PlayerController : MonoBehaviour
         if (isExitingCar) return;
         isExitingCar = true;
         isInCar = false;
+        
+        // Disattiva l'animazione di guida prima del movimento
+        animator.SetBool("isDriving", false);
         
         // Riattiva il movimento del player
         enabled = true;

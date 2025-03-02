@@ -390,12 +390,8 @@ public class CarController : MonoBehaviour
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
         
-        // Imposta l'animazione di guida
-        if (playerController.animator != null)
-        {
-            playerController.animator.SetBool("isDriving", true);
-        }
-
+        // Non gestiamo più l'animazione qui, è già stata attivata nel PlayerController
+        
         // Reset camera rotation con l'offset configurabile
         lastMouseMoveTime = Time.time;
         cameraRotationX = cameraPitchOffset;
@@ -413,10 +409,10 @@ public class CarController : MonoBehaviour
             PlayerController pc = other.GetComponent<PlayerController>();
             if (pc != null && !isPlayerInCar)  // Controlla se la macchina è già occupata
             {
+                Debug.Log("OnTriggerEnter: Player near car");
                 pc.nearCar = true;
                 pc.car = gameObject;
-                playerController = pc;
-                Debug.Log("Player can enter car");
+                // Non settare playerController qui, lo facciamo solo quando entra effettivamente
             }
         }
     }
@@ -426,14 +422,11 @@ public class CarController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             PlayerController pc = other.GetComponent<PlayerController>();
-            if (pc != null && !isPlayerInCar)  // Resetta solo se non è il player che sta guidando
+            if (pc != null && pc != playerController)  // Non resettare se è il player che sta guidando
             {
+                Debug.Log("OnTriggerExit: Player left car area");
                 pc.nearCar = false;
                 pc.car = null;
-                if (playerController == pc)
-                {
-                    playerController = null;
-                }
             }
         }
     }
@@ -463,11 +456,35 @@ public class CarController : MonoBehaviour
             // Riattiva le collisioni
             Physics.IgnoreCollision(playerController.GetComponent<Collider>(), carCollider, false);
             
-            // Mantiene il riferimento al player per permettergli di rientrare
+            // Mantieni il riferimento al player per permettergli di rientrare
             playerController.nearCar = true;
+            playerController.car = gameObject;
+
+            // Non azzerare playerController qui, lo facciamo solo quando si allontana effettivamente
+            StartCoroutine(ResetPlayerControllerAfterExit());
         }
 
         rb.isKinematic = false;
         isExitingCar = false;
+    }
+
+    private IEnumerator ResetPlayerControllerAfterExit()
+    {
+        // Aspetta un frame per assicurarci che tutti i trigger siano stati processati
+        yield return new WaitForFixedUpdate();
+        
+        // Se il player è ancora nel trigger della macchina, non resettare nulla
+        if (playerController != null && playerController.nearCar)
+        {
+            yield break;
+        }
+        
+        // Altrimenti, resetta i riferimenti
+        if (playerController != null)
+        {
+            playerController.nearCar = false;
+            playerController.car = null;
+            playerController = null;
+        }
     }
 }
