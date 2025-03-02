@@ -293,13 +293,17 @@ public class PlayerController : MonoBehaviour
         if (!isInCar)
         {
             isInCar = true;
-            animator.SetTrigger("enterCar");
-            yield return new WaitForSeconds(1.0f);
+            Debug.Log("Starting car enter sequence");
             
-            // Disattiva il movimento del player
+            // Disattiva temporaneamente lo script del player
             enabled = false;
             rb.isKinematic = true;
             
+            // Attiva l'animazione
+            animator.SetTrigger("enterCar");
+            yield return new WaitForSeconds(1.0f);
+            
+            // Entra nella macchina
             carController.EnterCar(this);
         }
     }
@@ -384,25 +388,32 @@ public class PlayerController : MonoBehaviour
         enabled = true;
         rb.isKinematic = false;
         
-        // Ripristina il controllo della camera per la modalità player
+        // Ripristina il controllo della camera
         xRotation = 0f;
         yRotation = transform.eulerAngles.y;
+        Cursor.lockState = CursorLockMode.Locked;
+        
+        // Ripristina la camera alla vista del character
+        UpdateCameraForCharacter();
         
         car.GetComponent<CarController>().ExitCar();
-        car = null;
+        // Non azzeriamo più il riferimento alla macchina
+        // car = null; // Rimuovi questa linea
+        nearCar = true; // Manteniamo lo stato "vicino alla macchina"
         isExitingCar = false;
     }
 
-    // Aggiungi questo nuovo metodo di supporto
-    private void UpdateCameraPosition()
+    private void UpdateCameraForCharacter()
     {
+        // Resetta la posizione della camera relativa al player
+        Vector3 desiredPosition = transform.position + Vector3.up * cameraHeightOffset;
+        cameraTransform.position = desiredPosition - transform.forward * cameraOffset.z;
+        
+        // Aggiorna la rotazione della camera
         Quaternion cameraRotation = Quaternion.Euler(xRotation + cameraRotationOffset.x, 
                                                    yRotation + cameraRotationOffset.y, 
                                                    cameraRotationOffset.z);
-        Vector3 desiredCameraPosition = transform.position + cameraRotation * cameraOffset;
-        desiredCameraPosition.y = Mathf.Max(transform.position.y + cameraHeightOffset, desiredCameraPosition.y);
-        cameraTransform.position = desiredCameraPosition;
-        cameraTransform.LookAt(transform.position + Vector3.up * cameraHeightOffset);
+        cameraTransform.rotation = cameraRotation;
     }
 
     public void ExitUFO()

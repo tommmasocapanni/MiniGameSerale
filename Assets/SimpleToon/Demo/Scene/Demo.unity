@@ -1502,9 +1502,9 @@ MonoBehaviour:
   - {r: 0.1266487, g: 1, b: 0.015686274, a: 1}
   - {r: 0.94275093, g: 0, b: 1, a: 1}
   driftLevelThresholds:
+  - 0
   - 2
   - 4
-  - 6
   wheelParticles:
   - {fileID: 2100290304}
   - {fileID: 2035047078}

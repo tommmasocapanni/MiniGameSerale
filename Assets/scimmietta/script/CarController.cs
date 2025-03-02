@@ -404,30 +404,19 @@ public class CarController : MonoBehaviour
         
         // Align car with seatTrigger
         transform.rotation = seatTrigger.rotation;
-
-        // Attiva la camera della macchina e disattiva quella del player
-        if (cameraTransform != null)
-        {
-            cameraTransform.gameObject.SetActive(true);
-            playerController.cameraTransform.gameObject.SetActive(false);
-        }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Car OnTriggerEnter with {other.gameObject.name}"); // Debug log
         if (other.CompareTag("Player"))
         {
-            playerController = other.GetComponent<PlayerController>();
-            if (playerController != null)
+            PlayerController pc = other.GetComponent<PlayerController>();
+            if (pc != null && !isPlayerInCar)  // Controlla se la macchina è già occupata
             {
-                Debug.Log("Player controller found"); // Debug log
-                playerController.nearCar = true;
-                playerController.car = gameObject;
-            }
-            else
-            {
-                Debug.LogError("PlayerController component not found on player"); // Debug log
+                pc.nearCar = true;
+                pc.car = gameObject;
+                playerController = pc;
+                Debug.Log("Player can enter car");
             }
         }
     }
@@ -436,11 +425,15 @@ public class CarController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (playerController != null)
+            PlayerController pc = other.GetComponent<PlayerController>();
+            if (pc != null && !isPlayerInCar)  // Resetta solo se non è il player che sta guidando
             {
-                playerController.nearCar = false;
-                playerController.car = null;
-                playerController = null;
+                pc.nearCar = false;
+                pc.car = null;
+                if (playerController == pc)
+                {
+                    playerController = null;
+                }
             }
         }
     }
@@ -461,17 +454,17 @@ public class CarController : MonoBehaviour
             playerController.transform.position = seatTrigger.position + seatTrigger.right * 2;
             playerController.transform.rotation = Quaternion.Euler(0, seatTrigger.eulerAngles.y, 0);
             
+            // Riattiva tutti i controlli del player
+            playerController.enabled = true;
+            
             // Disattiva animazione di guida
             playerController.animator.SetBool("isDriving", false);
             
             // Riattiva le collisioni
             Physics.IgnoreCollision(playerController.GetComponent<Collider>(), carCollider, false);
             
-            // Riattiva il controllo del player
-            playerController.enabled = true;
-            
-            // Resetta il riferimento al player
-            playerController = null;
+            // Mantiene il riferimento al player per permettergli di rientrare
+            playerController.nearCar = true;
         }
 
         rb.isKinematic = false;
