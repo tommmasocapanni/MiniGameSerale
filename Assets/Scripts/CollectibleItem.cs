@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class CollectibleItem : MonoBehaviour
 {
@@ -60,19 +61,25 @@ public class CollectibleItem : MonoBehaviour
                 Fire();
                 nextFireTime = Time.time + fireRate; // Imposta il prossimo momento in cui potrà sparare
             }
+            
+            // Resetta l'animazione quando si rilascia il tasto
+            if (Input.GetMouseButtonUp(0) && playerAnimator != null)
+            {
+                playerAnimator.SetBool("isFiring", false);
+            }
         }
     }
 
-    private void Fire()
+    protected virtual void Fire()
     {
         if (playerAnimator != null)
         {
-            playerAnimator.SetTrigger("isFiring"); // Cambiato da SetBool a SetTrigger
+            playerAnimator.SetBool("isFiring", true);
             Debug.Log("Firing!");
         }
     }
 
-    public void EquipItem()
+    public virtual void EquipItem()
     {
         if (isEquipped) return;
         

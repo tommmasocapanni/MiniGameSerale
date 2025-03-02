@@ -11,6 +11,7 @@ TagManager:
   - SeatTrigger
   - Jetpack
   - Hand
+  - bullet
   layers:
   - Default
   - TransparentFX
