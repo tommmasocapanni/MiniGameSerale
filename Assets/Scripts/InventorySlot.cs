@@ -8,6 +8,16 @@ public class InventorySlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemNameText;
     
     private CollectibleItem currentItem;
+    private Button button;
+
+    private void Awake()
+    {
+        button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(OnSlotClicked);
+        }
+    }
 
     public void SetItem(CollectibleItem item)
     {
@@ -29,5 +39,21 @@ public class InventorySlot : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+    }
+
+    private void OnSlotClicked()
+    {
+        if (currentItem != null)
+        {
+            InventoryManager.Instance.EquipItem(currentItem);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnSlotClicked);
+        }
     }
 }

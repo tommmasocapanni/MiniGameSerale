@@ -13,6 +13,8 @@ public class InventoryManager : MonoBehaviour
     private List<CollectibleItem> collectedItems = new List<CollectibleItem>();
     private List<InventorySlot> inventorySlots = new List<InventorySlot>();
     private bool isInventoryOpen = false;
+    private CollectibleItem equippedItem;
+    private int currentItemIndex = -1;
 
     private void Awake()
     {
@@ -40,15 +42,28 @@ public class InventoryManager : MonoBehaviour
         {
             ToggleInventory();
         }
+
+        // Gestione rotella mouse
+        float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+        if (scrollWheel != 0 && collectedItems.Count > 0)
+        {
+            if (scrollWheel > 0)
+                EquipNextItem();
+            else
+                EquipPreviousItem();
+        }
     }
 
     public void AddItem(CollectibleItem item)
     {
         if (!collectedItems.Contains(item))
         {
-            Debug.Log($"Aggiunto item: {item.ItemName}"); // Debug
             collectedItems.Add(item);
             CreateItemSlot(item);
+            Debug.Log($"Aggiunto item: {item.ItemName}");
+            
+            // Equipaggia automaticamente OGNI oggetto raccolto
+            EquipItem(item);
         }
     }
 
@@ -82,5 +97,59 @@ public class InventoryManager : MonoBehaviour
         {
             inventoryUI.SetActive(isInventoryOpen);
         }
+    }
+
+    public void EquipItem(CollectibleItem item)
+    {
+        // Non fare nulla se stiamo tentando di equipaggiare lo stesso oggetto
+        if (equippedItem == item) return;
+
+        // Disattiva l'oggetto precedentemente equipaggiato
+        if (equippedItem != null)
+        {
+            equippedItem.UnequipItem();
+        }
+
+        // Equipaggia il nuovo oggetto
+        equippedItem = item;
+        currentItemIndex = collectedItems.IndexOf(item);
+        item.EquipItem();
+        
+        Debug.Log($"Equipaggiato: {item.ItemName}");
+    }
+
+    private void EquipNextItem()
+    {
+        if (collectedItems.Count == 0) return;
+        
+        // Se nessun item è equipaggiato, equipaggia il primo
+        if (equippedItem == null)
+        {
+            currentItemIndex = 0;
+        }
+        else
+        {
+            currentItemIndex = (currentItemIndex + 1) % collectedItems.Count;
+        }
+        
+        EquipItem(collectedItems[currentItemIndex]);
+    }
+
+    private void EquipPreviousItem()
+    {
+        if (collectedItems.Count == 0) return;
+        
+        // Se nessun item è equipaggiato, equipaggia l'ultimo
+        if (equippedItem == null)
+        {
+            currentItemIndex = collectedItems.Count - 1;
+        }
+        else
+        {
+            currentItemIndex--;
+            if (currentItemIndex < 0) currentItemIndex = collectedItems.Count - 1;
+        }
+        
+        EquipItem(collectedItems[currentItemIndex]);
     }
 }

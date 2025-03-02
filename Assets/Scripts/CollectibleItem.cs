@@ -17,6 +17,8 @@ public class CollectibleItem : MonoBehaviour
     private Animator playerAnimator;
     private bool canFire = true;
     private float nextFireTime = 0f;
+    private bool isEquipped = false;
+    private Vector3 inventoryPosition = new Vector3(0, -1000, 0); // Posizione fuori vista
 
     private void Start()
     {
@@ -33,22 +35,19 @@ public class CollectibleItem : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            // Cerca il punto di riferimento della mano nel rig Mixamo
+            // Setup del transform e animator
             playerHandTransform = other.transform.Find("mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Hand");
             playerAnimator = other.GetComponent<Animator>();
             
-            if (playerHandTransform == null)
+            if (playerHandTransform == null || playerAnimator == null)
             {
-                Debug.LogWarning("Aggiungi un GameObject 'Hand' come figlio della bone RightHand!");
-                return;
-            }
-            if (playerAnimator == null)
-            {
-                Debug.LogWarning("Player non ha un componente Animator!");
+                Debug.LogWarning("Missing references on player!");
                 return;
             }
 
-            EquipItem();
+            // Raccogli e aggiungi all'inventario (che lo equipaggerà automaticamente)
+            isCollected = true;
+            InventoryManager.Instance.AddItem(this);
         }
     }
 
@@ -73,29 +72,25 @@ public class CollectibleItem : MonoBehaviour
         }
     }
 
-    private void EquipItem()
+    public void EquipItem()
     {
-        isCollected = true;
+        if (isEquipped) return;
         
-        // Aggiungi questa riga PRIMA di tutto il resto
-        InventoryManager.Instance.AddItem(this);
-        
-        // Disattiva physics e collider
-        if (TryGetComponent<Rigidbody>(out Rigidbody rb))
-        {
-            rb.isKinematic = true;
-        }
-        if (TryGetComponent<Collider>(out Collider col))
-        {
-            col.enabled = false;
-        }
-
-        // Parent l'oggetto alla mano e posizionalo
+        isEquipped = true;
         transform.SetParent(playerHandTransform);
         transform.localPosition = equipPosition;
         transform.localEulerAngles = equipRotation;
-
-        Debug.Log($"{itemName} equipaggiato!");
+        gameObject.SetActive(true);
         canFire = true;
+    }
+
+    public void UnequipItem()
+    {
+        if (!isEquipped) return;
+        
+        isEquipped = false;
+        canFire = false;
+        transform.position = inventoryPosition; // Sposta l'oggetto fuori vista
+        gameObject.SetActive(false);
     }
 }
