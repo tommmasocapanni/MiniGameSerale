@@ -296,7 +296,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 1852576806548013000, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1352673276}
     m_AddedComponents:
@@ -1162,11 +1162,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.8, z: 1}
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!4 &582747319 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
-  m_PrefabInstance: {fileID: 116298898}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &655555587
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7403,12 +7398,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1352673275}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.58422506, y: 0.8464264, z: -0.07678119}
+  m_LocalRotation: {x: 0.681187, y: 0.68477345, z: -0.18965553, w: 0.1763532}
+  m_LocalPosition: {x: 0, y: -0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 582747319}
+  m_Father: {fileID: 1566285374}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1001 &1362084965
 PrefabInstance:
@@ -12705,6 +12700,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3467851699220123360, guid: 93df5c48d5e021040916b0e984d9b01a, type: 3}
   m_PrefabInstance: {fileID: 1710233188}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1566285374 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1852576806548013000, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
+  m_PrefabInstance: {fileID: 116298898}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1650274603
 GameObject:
   m_ObjectHideFlags: 0
@@ -12816,6 +12816,7 @@ MonoBehaviour:
   itemName: Item
   equipPosition: {x: 0, y: 0, z: 0}
   equipRotation: {x: 0, y: 0, z: 0}
+  fireRate: 0.5
 --- !u!1001 &1683015661
 PrefabInstance:
   m_ObjectHideFlags: 0

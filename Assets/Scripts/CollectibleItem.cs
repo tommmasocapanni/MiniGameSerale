@@ -28,13 +28,13 @@ public class CollectibleItem : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            // Cerca il punto di riferimento della mano del player
-            playerHandTransform = other.transform.Find("Hand");
+            // Cerca il punto di riferimento della mano nel rig Mixamo
+            playerHandTransform = other.transform.Find("mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Hand");
             playerAnimator = other.GetComponent<Animator>();
             
             if (playerHandTransform == null)
             {
-                Debug.LogWarning("Aggiungi un GameObject 'Hand' come figlio del Player!");
+                Debug.LogWarning("Aggiungi un GameObject 'Hand' come figlio della bone RightHand!");
                 return;
             }
             if (playerAnimator == null)
