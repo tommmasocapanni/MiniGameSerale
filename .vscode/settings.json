@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "TestProjectsGame.sln"
+    "dotnet.defaultSolution": "MiniGameSerale.sln"
 }

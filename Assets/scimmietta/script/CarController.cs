@@ -155,14 +155,28 @@ public class CarController : MonoBehaviour
             }
         }
 
-        // Drift input
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDrifting && Mathf.Abs(horizontalInput) > 0.1f)
+        // VERIFICA: Aggiungi debug per input drift
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            Debug.Log($"Shift pressed - Speed: {currentSpeed}, Horizontal: {horizontalInput}");
+        }
+        
+        // Modifica gestione drift input
+        bool shiftPressed = Input.GetKey(KeyCode.LeftShift);  // Cambiato da GetKeyDown a GetKey
+        
+        if (shiftPressed && !isDrifting && Mathf.Abs(horizontalInput) > 0.1f)
         {
             StartDrift();
         }
-        else if (Input.GetKeyUp(KeyCode.LeftShift) && isDrifting)
+        else if (!shiftPressed && isDrifting)  // Cambiato da GetKeyUp a !shiftPressed
         {
             EndDrift();
+        }
+
+        // Debug continuo dello stato del drift
+        if (isDrifting && Time.frameCount % 60 == 0)  // Log ogni secondo
+        {
+            Debug.Log($"Drift Active - Shift Held: {shiftPressed}, Power: {driftPower:F2}, Level: {driftLevel}");
         }
     }
 
@@ -188,19 +202,38 @@ public class CarController : MonoBehaviour
             float turnAmount = horizontalInput * turnSpeed * Time.fixedDeltaTime;
             if (currentSpeed < 0) turnAmount = -turnAmount;
 
+            // Verifica che il drift sia ancora valido
+            if (isDrifting && !Input.GetKey(KeyCode.LeftShift))
+            {
+                EndDrift();  // Failsafe aggiuntivo
+            }
+
             // Applica il moltiplicatore di steering durante il drift
             if (isDrifting)
             {
                 turnAmount *= driftSteeringMultiplier;
-                // Accumula drift power
+                
+                // VERIFICA: Migliora calcolo drift power
                 float powerControl = (driftDirection == 1) ? 
-                    Remap(horizontalInput, -1, 1, 0.2f, 1) : 
-                    Remap(horizontalInput, -1, 1, 1, 0.2f);
+                    Mathf.Lerp(0.2f, 1f, Mathf.Abs(horizontalInput)) : 
+                    Mathf.Lerp(1f, 0.2f, Mathf.Abs(horizontalInput));
+                    
                 driftPower += powerControl * driftPowerGain * Time.fixedDeltaTime;
+                
+                // Debug per monitorare i valori
+                if (Time.frameCount % 30 == 0) // Log ogni 30 frames per non spammare
+                {
+                    Debug.Log($"Drift - Power: {driftPower:F2}, Direction: {driftDirection}, Control: {powerControl:F2}");
+                }
+                
                 UpdateDriftLevel();
             }
 
             transform.RotateAround(seatTrigger.position, Vector3.up, turnAmount);
+        }
+        else if (isDrifting)  // Se la velocità è troppo bassa, termina il drift
+        {
+            EndDrift();
         }
     }
 
@@ -258,6 +291,8 @@ public class CarController : MonoBehaviour
         driftTimer = 0f;
         driftLevel = 0;
         
+        Debug.Log($"Drift Started - Direction: {driftDirection}");
+        
         // Attiva le particelle con il colore iniziale
         foreach (ParticleSystem ps in wheelParticles)
         {
@@ -269,13 +304,18 @@ public class CarController : MonoBehaviour
 
     private void EndDrift()
     {
-        isDrifting = false;
+        if (!isDrifting) return;  // Previene chiamate multiple
         
-        // Applica boost basato sul tempo totale di drift
+        isDrifting = false;
+        Debug.Log("Drift Ended - Final Level: " + driftLevel);
+        
+        // VERIFICA: Migliora calcolo boost finale
         if (driftLevel > 0)
         {
             float boostMultiplier = 1f + (driftLevel * 0.2f);
-            currentSpeed *= boostMultiplier;
+            float finalSpeed = currentSpeed * boostMultiplier;
+            Debug.Log($"Drift End - Level: {driftLevel}, Boost: x{boostMultiplier:F2}, Final Speed: {finalSpeed:F2}");
+            currentSpeed = finalSpeed;
         }
 
         // Resetta i valori
