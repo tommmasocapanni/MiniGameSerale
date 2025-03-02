@@ -10,6 +10,7 @@ TagManager:
   - UFOSeatTrigger
   - SeatTrigger
   - Jetpack
+  - Hand
   layers:
   - Default
   - TransparentFX
