@@ -1495,8 +1495,8 @@ MonoBehaviour:
   cameraTurnEffect: 0.5
   cameraYawOffset: 180
   cameraPitchOffset: 1
-  driftPowerGain: 10
-  driftSteeringMultiplier: 3
+  driftPowerGain: 2
+  driftSteeringMultiplier: 2
   driftColors:
   - {r: 1, g: 0.92156863, b: 0.011764706, a: 1}
   - {r: 0.1266487, g: 1, b: 0.015686274, a: 1}
@@ -13113,7 +13113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61d3d4bae36f342e486ceed70ed81319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jetpackForce: 2
+  jetpackForce: 1
   maxFuel: 100
   fuelConsumptionRate: 20
   fuelRechargeRate: 50
