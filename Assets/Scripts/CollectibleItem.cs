@@ -3,10 +3,15 @@ using UnityEngine;
 public class CollectibleItem : MonoBehaviour
 {
     [SerializeField] private string itemName = "Item";
+    [SerializeField] private Sprite itemIcon;
     [SerializeField] private Vector3 equipPosition = Vector3.zero;
     [SerializeField] private Vector3 equipRotation = Vector3.zero;
     [SerializeField] private float fireRate = 0.5f; // Tempo tra ogni sparo in secondi
-    
+
+    // Aggiungi queste proprietà pubbliche
+    public string ItemName => itemName;
+    public Sprite ItemIcon => itemIcon;
+
     private bool isCollected = false;
     private Transform playerHandTransform;
     private Animator playerAnimator;
@@ -71,6 +76,9 @@ public class CollectibleItem : MonoBehaviour
     private void EquipItem()
     {
         isCollected = true;
+        
+        // Aggiungi questa riga PRIMA di tutto il resto
+        InventoryManager.Instance.AddItem(this);
         
         // Disattiva physics e collider
         if (TryGetComponent<Rigidbody>(out Rigidbody rb))
