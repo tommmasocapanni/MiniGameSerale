@@ -384,9 +384,25 @@ public class PlayerController : MonoBehaviour
         enabled = true;
         rb.isKinematic = false;
         
+        // Ripristina il controllo della camera per la modalità player
+        xRotation = 0f;
+        yRotation = transform.eulerAngles.y;
+        
         car.GetComponent<CarController>().ExitCar();
         car = null;
         isExitingCar = false;
+    }
+
+    // Aggiungi questo nuovo metodo di supporto
+    private void UpdateCameraPosition()
+    {
+        Quaternion cameraRotation = Quaternion.Euler(xRotation + cameraRotationOffset.x, 
+                                                   yRotation + cameraRotationOffset.y, 
+                                                   cameraRotationOffset.z);
+        Vector3 desiredCameraPosition = transform.position + cameraRotation * cameraOffset;
+        desiredCameraPosition.y = Mathf.Max(transform.position.y + cameraHeightOffset, desiredCameraPosition.y);
+        cameraTransform.position = desiredCameraPosition;
+        cameraTransform.LookAt(transform.position + Vector3.up * cameraHeightOffset);
     }
 
     public void ExitUFO()

@@ -404,6 +404,13 @@ public class CarController : MonoBehaviour
         
         // Align car with seatTrigger
         transform.rotation = seatTrigger.rotation;
+
+        // Attiva la camera della macchina e disattiva quella del player
+        if (cameraTransform != null)
+        {
+            cameraTransform.gameObject.SetActive(true);
+            playerController.cameraTransform.gameObject.SetActive(false);
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -449,11 +456,21 @@ public class CarController : MonoBehaviour
             // Riattiva la fisica del player
             playerController.rb.isKinematic = false;
             
+            // Posiziona il player di lato alla macchina
             playerController.transform.SetParent(null);
             playerController.transform.position = seatTrigger.position + seatTrigger.right * 2;
             playerController.transform.rotation = Quaternion.Euler(0, seatTrigger.eulerAngles.y, 0);
+            
+            // Disattiva animazione di guida
             playerController.animator.SetBool("isDriving", false);
+            
+            // Riattiva le collisioni
             Physics.IgnoreCollision(playerController.GetComponent<Collider>(), carCollider, false);
+            
+            // Riattiva il controllo del player
+            playerController.enabled = true;
+            
+            // Resetta il riferimento al player
             playerController = null;
         }
 
