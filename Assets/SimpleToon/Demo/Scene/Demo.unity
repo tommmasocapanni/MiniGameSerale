@@ -1193,7 +1193,7 @@ GameObject:
   - component: {fileID: 232774446}
   - component: {fileID: 232774445}
   m_Layer: 5
-  m_Name: Button - Symbol (No Platter) (1)
+  m_Name: ButtonPlay - Symbol (No Platter) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1475,7 +1475,7 @@ GameObject:
   - component: {fileID: 268959109}
   - component: {fileID: 268959108}
   m_Layer: 5
-  m_Name: Button - Symbol (No Platter) (2)
+  m_Name: ButtonSucc - Symbol (No Platter) (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4122,6 +4122,18 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -579246485435456305, guid: 5353198b470024f458a9f549d5cb1d55, type: 3}
+--- !u!114 &731020638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731020623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47a5bd13875544921aa263568ff09efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &739151342
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6559,8 +6571,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1016640978}
+  - component: {fileID: 1016640979}
   m_Layer: 5
-  m_Name: Music info + toolbar
+  m_Name: MusicUIController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6587,6 +6600,26 @@ RectTransform:
   m_AnchoredPosition: {x: 16, y: 28}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1016640979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016640977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8626dcdd3e49e4791abfd3d9998ae3b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coverImage: {fileID: 1683851158}
+  titleText: {fileID: 234468532}
+  artistText: {fileID: 1713523763}
+  playPauseButton: {fileID: 232774446}
+  nextButton: {fileID: 268959109}
+  previousButton: {fileID: 1204515386}
+  playSprite: {fileID: 21300000, guid: 56b55be42f5c3d24cadf6e10110ee1d1, type: 3}
+  pauseSprite: {fileID: 21300000, guid: c8581ddbcd8586345b1c17c866e30ade, type: 3}
 --- !u!1001 &1028232905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11855,7 +11888,7 @@ GameObject:
   - component: {fileID: 1204515386}
   - component: {fileID: 1204515385}
   m_Layer: 5
-  m_Name: Button - Symbol (No Platter)
+  m_Name: ButtonPrec - Symbol (No Platter)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26132,6 +26165,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5353198b470024f458a9f549d5cb1d55, type: 3}
       insertIndex: -1
       addedObject: {fileID: 731020635}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5353198b470024f458a9f549d5cb1d55, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 731020638}
     - targetCorrespondingSourceObject: {fileID: 7239309361641813745, guid: 5353198b470024f458a9f549d5cb1d55, type: 3}
       insertIndex: -1
       addedObject: {fileID: 366939090}
@@ -26275,6 +26311,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 0
+--- !u!1 &2005750662
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2005750664}
+  - component: {fileID: 2005750663}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2005750663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005750662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c0f18f6707d348cdaf44d0627e6425a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playlist:
+  - title: Have_Fun.mp3
+    artist: jan2k1
+    audioClip: {fileID: 8300000, guid: 2340a757c42a0471e98b612e1dab00f9, type: 3}
+    coverArt: {fileID: 21300000, guid: 02c7794e6ea414eb380e0b0d969afae3, type: 3}
+  - title: 
+    artist: 
+    audioClip: {fileID: 0}
+    coverArt: {fileID: 0}
+  isPlaying: 0
+--- !u!4 &2005750664
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005750662}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.8903532, y: 0.98371786, z: -4.9494376}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2015163629
 GameObject:
   m_ObjectHideFlags: 0
@@ -36599,5 +36689,6 @@ SceneRoots:
   - {fileID: 1336163776}
   - {fileID: 1475502310}
   - {fileID: 1670360574}
+  - {fileID: 2005750664}
   - {fileID: 635923249}
   - {fileID: 874771321}

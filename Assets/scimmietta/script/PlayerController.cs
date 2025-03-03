@@ -299,17 +299,20 @@ public class PlayerController : MonoBehaviour
             isInCar = true;
             Debug.Log("Starting car enter sequence");
             
-            // Prima disattiva i controlli
+            // Riattiva questa riga per disabilitare il controller durante la guida
             enabled = false;
             rb.isKinematic = true;
             
-            // Attiva l'animazione prima di entrare nella macchina
             animator.SetBool("isDriving", true);
             
-            // Aspetta che l'animazione si avvii
+            // Aggiungi questa linea per far partire la musica
+            AudioManager.Instance.StartCarMusic();
+            
+            // Mostra la UI della musica
+            MusicUIController.Instance.ShowMusicUI(true);
+            
             yield return new WaitForSeconds(0.1f);
             
-            // Entra nella macchina
             carController.EnterCar(this);
         }
     }
@@ -390,7 +393,12 @@ public class PlayerController : MonoBehaviour
         isExitingCar = true;
         isInCar = false;
         
-        // Disattiva l'animazione di guida prima del movimento
+        // Ferma completamente la musica quando esci dalla macchina
+        AudioManager.Instance.StopCarMusic();
+        
+        // Nascondi la UI della musica
+        MusicUIController.Instance.ShowMusicUI(false);
+        
         animator.SetBool("isDriving", false);
         
         // Riattiva il movimento del player

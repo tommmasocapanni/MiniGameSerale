@@ -133,6 +133,15 @@ public class CarController : MonoBehaviour
         cameraTransform.position = transform.position + rotation * cameraOffset;
         cameraTransform.LookAt(transform.position + Vector3.up * 2);
 
+        // Controlla se il giocatore preme "R" per attivare/disattivare la musica
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log("CarController: Toggling music with R key");
+            AudioManager.Instance.PlayPause();
+            // Aggiorna l'UI quando si preme R
+            MusicUIController.Instance.UpdatePlayPauseButton(AudioManager.Instance.isPlaying);
+        }
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             ExitCar();
@@ -390,7 +399,8 @@ public class CarController : MonoBehaviour
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
         
-        // Non gestiamo più l'animazione qui, è già stata attivata nel PlayerController
+        // Mostra la UI della musica
+        MusicUIController.Instance.ShowMusicUI(true);
         
         // Reset camera rotation con l'offset configurabile
         lastMouseMoveTime = Time.time;
@@ -466,6 +476,12 @@ public class CarController : MonoBehaviour
 
         rb.isKinematic = false;
         isExitingCar = false;
+        
+        // Assicurati che la musica sia completamente fermata
+        AudioManager.Instance.StopCarMusic();
+        
+        // Nascondi la UI della musica
+        MusicUIController.Instance.ShowMusicUI(false);
     }
 
     private IEnumerator ResetPlayerControllerAfterExit()
