@@ -9,11 +9,17 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject slotPrefab; // Prefab per ogni slot
     [SerializeField] private Transform slotsParent; // Il container degli slot (es: Grid Layout Group)
+    
     [Header("UI References")]
     [SerializeField] private Image equippedItemImage; // Riferimento all'immagine UI dell'oggetto equipaggiato
     
+    [Header("Favorites System")]
+    [SerializeField] private int maxFavoriteSlots = 4; // Numero massimo di slot preferiti
+    [SerializeField] private FavoriteSlot[] favoriteSlots; // Riferimenti agli slot preferiti esistenti nella UI
+    
     private List<CollectibleItem> collectedItems = new List<CollectibleItem>();
     private List<InventorySlot> inventorySlots = new List<InventorySlot>();
+    private CollectibleItem[] favoriteItems; // Array di oggetti preferiti
     private bool isInventoryOpen = false;
     private CollectibleItem equippedItem;
     private int currentItemIndex = -1;
@@ -28,6 +34,9 @@ public class InventoryManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
+        // Inizializza l'array dei preferiti
+        favoriteItems = new CollectibleItem[maxFavoriteSlots];
     }
 
     private void Start()
@@ -41,6 +50,29 @@ public class InventoryManager : MonoBehaviour
         if (equippedItemImage != null)
         {
             equippedItemImage.enabled = false;
+        }
+        
+        // Verifica che abbiamo gli slot preferiti
+        if (favoriteSlots == null || favoriteSlots.Length == 0)
+        {
+            Debug.LogWarning("Non ci sono FavoriteSlot configurati. Cercando slot nella scena...");
+            favoriteSlots = FindObjectsOfType<FavoriteSlot>();
+            
+            if (favoriteSlots.Length == 0)
+            {
+                Debug.LogError("Nessun FavoriteSlot trovato nella scena! Il sistema dei preferiti non funzionerà.");
+            }
+            else if (favoriteSlots.Length < maxFavoriteSlots)
+            {
+                Debug.LogWarning($"Trovati solo {favoriteSlots.Length} FavoriteSlot, ma servono {maxFavoriteSlots} slot.");
+                maxFavoriteSlots = favoriteSlots.Length;
+            }
+        }
+        
+        // Inizializza gli slot con i rispettivi indici
+        for (int i = 0; i < favoriteSlots.Length && i < maxFavoriteSlots; i++)
+        {
+            favoriteSlots[i].Initialize(i);
         }
     }
 
@@ -60,6 +92,16 @@ public class InventoryManager : MonoBehaviour
             else
                 EquipPreviousItem();
         }
+
+        // Aggiunta gestione tasti numerici per selezionare i preferiti
+        for (int i = 0; i < maxFavoriteSlots; i++)
+        {
+            // I tasti numerici sono 1, 2, 3, 4, ecc.
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+            {
+                EquipFavorite(i);
+            }
+        }
     }
 
     public void AddItem(CollectibleItem item)
@@ -69,6 +111,9 @@ public class InventoryManager : MonoBehaviour
             collectedItems.Add(item);
             CreateItemSlot(item);
             Debug.Log($"Aggiunto item: {item.ItemName}");
+            
+            // Aggiungi l'item ai preferiti se c'è spazio
+            TryAddToFavorites(item);
             
             // Equipaggia automaticamente OGNI oggetto raccolto
             EquipItem(item);
@@ -166,5 +211,75 @@ public class InventoryManager : MonoBehaviour
         }
         
         EquipItem(collectedItems[currentItemIndex]);
+    }
+
+    private void TryAddToFavorites(CollectibleItem item)
+    {
+        // Cerca il primo slot vuoto nei preferiti
+        for (int i = 0; i < favoriteItems.Length && i < favoriteSlots.Length; i++)
+        {
+            if (favoriteItems[i] == null)
+            {
+                // Aggiungi l'item a questo slot preferito
+                favoriteItems[i] = item;
+                favoriteSlots[i].SetItem(item);
+                Debug.Log($"Aggiunto '{item.ItemName}' al preferito #{i+1}");
+                return; // Esci dalla funzione una volta trovato uno slot
+            }
+        }
+        
+        // Se arriviamo qui, tutti gli slot preferiti sono pieni
+        Debug.Log("Tutti gli slot preferiti sono occupati. L'item non è stato aggiunto ai preferiti.");
+    }
+
+    public void RemoveFromFavorites(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= favoriteItems.Length || slotIndex >= favoriteSlots.Length)
+        {
+            Debug.LogError($"Indice slot preferito non valido: {slotIndex}");
+            return;
+        }
+        
+        favoriteItems[slotIndex] = null;
+        favoriteSlots[slotIndex].SetItem(null);
+    }
+
+    public void SwapFavorites(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= favoriteItems.Length || fromIndex >= favoriteSlots.Length || 
+            toIndex < 0 || toIndex >= favoriteItems.Length || toIndex >= favoriteSlots.Length)
+        {
+            Debug.LogError("Indici slot preferiti non validi per lo scambio");
+            return;
+        }
+        
+        // Scambia gli item
+        CollectibleItem temp = favoriteItems[fromIndex];
+        favoriteItems[fromIndex] = favoriteItems[toIndex];
+        favoriteItems[toIndex] = temp;
+        
+        // Aggiorna la UI
+        favoriteSlots[fromIndex].SetItem(favoriteItems[fromIndex]);
+        favoriteSlots[toIndex].SetItem(favoriteItems[toIndex]);
+    }
+
+    public void EquipFavorite(int index)
+    {
+        if (index < 0 || index >= favoriteItems.Length)
+        {
+            Debug.LogError($"Indice preferito non valido: {index}");
+            return;
+        }
+        
+        CollectibleItem item = favoriteItems[index];
+        if (item != null)
+        {
+            Debug.Log($"Equipaggio preferito #{index+1}: {item.ItemName}");
+            EquipItem(item);
+        }
+        else
+        {
+            Debug.Log($"Nessun item nel preferito #{index+1}");
+        }
     }
 }
