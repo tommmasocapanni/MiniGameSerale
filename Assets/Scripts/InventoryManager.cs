@@ -150,6 +150,26 @@ public class InventoryManager : MonoBehaviour
         {
             inventoryUI.SetActive(isInventoryOpen);
         }
+        
+        // Control cursor visibility based on inventory state
+        if (CursorManager.Instance != null)
+        {
+            CursorManager.Instance.SetInventoryOpen(isInventoryOpen);
+        }
+        else
+        {
+            // Fallback if no cursor manager exists
+            if (isInventoryOpen)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
     }
 
     public void EquipItem(CollectibleItem item)
@@ -280,6 +300,20 @@ public class InventoryManager : MonoBehaviour
         else
         {
             Debug.Log($"Nessun item nel preferito #{index+1}");
+        }
+    }
+
+    // Add this method to manually show the cursor when needed
+    public void ShowCursor()
+    {
+        if (CursorManager.Instance != null)
+        {
+            CursorManager.Instance.ForceShowCursor();
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 }
