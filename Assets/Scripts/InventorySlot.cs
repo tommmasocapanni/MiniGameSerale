@@ -41,7 +41,7 @@ public class InventorySlot : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    private void OnSlotClicked()
+    protected virtual void OnSlotClicked()
     {
         if (currentItem != null)
         {

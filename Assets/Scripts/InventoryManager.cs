@@ -17,6 +17,11 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private int maxFavoriteSlots = 4; // Numero massimo di slot preferiti
     [SerializeField] private FavoriteSlot[] favoriteSlots; // Riferimenti agli slot preferiti esistenti nella UI
     
+    [SerializeField] private GameObject consumableSlotPrefab;
+    [SerializeField] private Transform consumablesParent;
+    private List<ConsumableItem> consumableItems = new List<ConsumableItem>();
+    private List<ConsumableSlot> consumableSlots = new List<ConsumableSlot>();
+    
     private List<CollectibleItem> collectedItems = new List<CollectibleItem>();
     private List<InventorySlot> inventorySlots = new List<InventorySlot>();
     private CollectibleItem[] favoriteItems; // Array di oggetti preferiti
@@ -106,17 +111,24 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(CollectibleItem item)
     {
-        if (!collectedItems.Contains(item))
+        if (item is ConsumableItem consumable)
         {
-            collectedItems.Add(item);
-            CreateItemSlot(item);
-            Debug.Log($"Aggiunto item: {item.ItemName}");
-            
-            // Aggiungi l'item ai preferiti se c'è spazio
-            TryAddToFavorites(item);
-            
-            // Equipaggia automaticamente OGNI oggetto raccolto
-            EquipItem(item);
+            AddConsumableItem(consumable);
+        }
+        else
+        {
+            if (!collectedItems.Contains(item))
+            {
+                collectedItems.Add(item);
+                CreateItemSlot(item);
+                Debug.Log($"Aggiunto item: {item.ItemName}");
+                
+                // Aggiungi l'item ai preferiti se c'è spazio
+                TryAddToFavorites(item);
+                
+                // Equipaggia automaticamente OGNI oggetto raccolto
+                EquipItem(item);
+            }
         }
     }
 
@@ -315,5 +327,64 @@ public class InventoryManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
+    }
+
+    private void AddConsumableItem(ConsumableItem newItem)
+    {
+        // Cerca un item esistente dello stesso tipo
+        ConsumableItem existingItem = consumableItems.Find(item => 
+            item.GetType() == newItem.GetType() && item.CanStack(newItem));
+
+        if (existingItem != null)
+        {
+            // Usa SOLO pickupAmount, ignora la quantity dell'item
+            existingItem.AddToStack(newItem.PickupAmount);
+            UpdateConsumableSlot(existingItem);
+            Debug.Log($"Stacked {newItem.ItemName}, New quantity: {existingItem.Quantity}");
+            Destroy(newItem.gameObject);
+        }
+        else
+        {
+            // Per nuovo item, imposta la quantity al pickupAmount
+            newItem.Quantity = newItem.PickupAmount;
+            consumableItems.Add(newItem);
+            CreateConsumableSlot(newItem);
+            Debug.Log($"Added new consumable: {newItem.ItemName}, Initial quantity: {newItem.Quantity}");
+        }
+    }
+
+    private void CreateConsumableSlot(ConsumableItem item)
+    {
+        if (consumableSlotPrefab == null || consumablesParent == null) return;
+
+        GameObject newSlot = Instantiate(consumableSlotPrefab, consumablesParent);
+        ConsumableSlot slotScript = newSlot.GetComponent<ConsumableSlot>();
+        
+        if (slotScript != null)
+        {
+            slotScript.SetConsumableItem(item);
+            consumableSlots.Add(slotScript);
+        }
+    }
+
+    private void UpdateConsumableSlot(ConsumableItem item)
+    {
+        ConsumableSlot slot = consumableSlots.Find(s => s.GetComponent<ConsumableSlot>().CurrentItem == item);
+        if (slot != null)
+        {
+            slot.SetConsumableItem(item);
+        }
+    }
+
+    public void RemoveEmptyConsumable(ConsumableItem item)
+    {
+        consumableItems.Remove(item);
+        ConsumableSlot slot = consumableSlots.Find(s => s.GetComponent<ConsumableSlot>().CurrentItem == item);
+        if (slot != null)
+        {
+            consumableSlots.Remove(slot);  // Fixed: 'remove' to 'Remove'
+            Destroy(slot.gameObject);
+        }
+        Destroy(item.gameObject);
     }
 }
