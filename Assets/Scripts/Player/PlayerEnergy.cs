@@ -4,6 +4,7 @@ public class PlayerEnergy : MonoBehaviour
 {
     [SerializeField] private float maxEnergy = 100f;
     [SerializeField] private float energyRegenRate = 5f;
+    [SerializeField] private ParticleSystem energyRestoreEffect; // Nuovo campo
     private float currentEnergy;
 
     private void Start()
@@ -23,6 +24,10 @@ public class PlayerEnergy : MonoBehaviour
     public void RestoreEnergy(float amount)
     {
         currentEnergy = Mathf.Min(currentEnergy + amount, maxEnergy);
+        if (energyRestoreEffect != null)
+        {
+            energyRestoreEffect.Play();
+        }
         Debug.Log($"Energy restored: {amount}. Current energy: {currentEnergy}");
     }
 

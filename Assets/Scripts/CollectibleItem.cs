@@ -48,6 +48,7 @@ public class CollectibleItem : MonoBehaviour
 
             // Raccogli e aggiungi all'inventario (che lo equipaggerà automaticamente)
             isCollected = true;
+            OnPickup();  // Call OnPickup before adding to inventory
             InventoryManager.Instance.AddItem(this);
         }
     }
@@ -77,6 +78,11 @@ public class CollectibleItem : MonoBehaviour
             playerAnimator.SetBool("isFiring", true);
             Debug.Log("Firing!");
         }
+    }
+
+    protected virtual void OnPickup()
+    {
+        // Base implementation - can be empty
     }
 
     public virtual void EquipItem()
