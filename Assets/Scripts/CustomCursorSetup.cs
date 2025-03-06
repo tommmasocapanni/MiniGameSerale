@@ -50,7 +50,7 @@ public class CustomCursorSetup : MonoBehaviour
             cursorImage.sprite = normalCursorSprite;
             
             // Find or add CursorManager
-            CursorManager manager = FindObjectOfType<CursorManager>();
+            CursorManager manager = FindFirstObjectByType<CursorManager>();
             if (manager == null)
             {
                 manager = gameObject.AddComponent<CursorManager>();

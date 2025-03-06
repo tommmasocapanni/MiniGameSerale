@@ -12,7 +12,8 @@ public class CursorManager : MonoBehaviour
     [SerializeField] private Sprite clickCursorSprite;
     [SerializeField] private Canvas cursorCanvas;
 
-    private bool isSystemCursorVisible = false;
+    [SerializeField] private bool isSystemCursorVisible;
+
     private bool isInventoryOpen = false;
     
     private void Awake()
@@ -40,6 +41,11 @@ public class CursorManager : MonoBehaviour
             ShowCustomCursor(false);
             HideSystemCursor();
         }
+    }
+
+    private void Start()
+    {
+        Cursor.visible = isSystemCursorVisible;
     }
 
     private void Update()
