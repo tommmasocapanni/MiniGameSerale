@@ -7,7 +7,7 @@ public abstract class CollectibleItem : MonoBehaviour
     [SerializeField] private Sprite itemIcon;
     [SerializeField] private Vector3 equipPosition = Vector3.zero;
     [SerializeField] private Vector3 equipRotation = Vector3.zero;
-    [SerializeField] private float fireRate = 0.5f; // Tempo tra ogni sparo in secondi
+    // Rimosso fireRate da qui
 
     // Aggiungi queste proprietà pubbliche
     public string ItemName => itemName;

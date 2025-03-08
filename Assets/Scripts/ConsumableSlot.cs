@@ -20,7 +20,19 @@ public class ConsumableSlot : InventorySlot
     {
         if (quantityText != null && consumableItem != null)
         {
-            quantityText.text = consumableItem.Quantity.ToString();
+            // Special handling for MoneyItem
+            if (consumableItem is MoneyItem)
+            {
+                var playerMoney = FindFirstObjectByType<PlayerMoney>();
+                if (playerMoney != null)
+                {
+                    quantityText.text = playerMoney.GetCurrentMoney().ToString();
+                }
+            }
+            else
+            {
+                quantityText.text = consumableItem.Quantity.ToString();
+            }
             quantityText.gameObject.SetActive(true);
         }
         else
