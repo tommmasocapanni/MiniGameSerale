@@ -9,7 +9,9 @@ public class ShootableItem : CollectibleItem
     [SerializeField] private float bulletSpeed = 30f;
     [SerializeField] private float bulletLifetime = 3f;
     [SerializeField] private float recoilForce = 1f; // Adjust this to control recoil strength
-    
+    [SerializeField] private float fireRate = 0.5f;
+    private float nextFireTime = 0f;
+
     [Header("Camera Reference")]
     [SerializeField] private Camera playerCamera;
 
@@ -45,6 +47,20 @@ public class ShootableItem : CollectibleItem
         }
 
         Destroy(bullet, bulletLifetime);
+    }
+
+    protected override void HandleInput()
+    {
+        if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
+        {
+            Fire();
+            nextFireTime = Time.time + fireRate;
+        }
+        
+        if (Input.GetMouseButtonUp(0) && playerAnimator != null)
+        {
+            playerAnimator.SetBool("isFiring", false);
+        }
     }
 
     public override void EquipItem()

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class CollectibleItem : MonoBehaviour
+public abstract class CollectibleItem : MonoBehaviour
 {
     [SerializeField] private string itemName = "Item";
     [SerializeField] private Sprite itemIcon;
@@ -15,10 +15,10 @@ public class CollectibleItem : MonoBehaviour
 
     private bool isCollected = false;
     private Transform playerHandTransform;
-    private Animator playerAnimator;
+    protected Animator playerAnimator;
     private bool canFire = true;
     private float nextFireTime = 0f;
-    private bool isEquipped = false;
+    protected bool isEquipped = false;
     private Vector3 inventoryPosition = new Vector3(0, -1000, 0); // Posizione fuori vista
 
     private void Start()
@@ -55,20 +55,15 @@ public class CollectibleItem : MonoBehaviour
 
     private void Update()
     {
-        if (isCollected && canFire)
+        if (isCollected && isEquipped)
         {
-            if (Input.GetMouseButton(0) && Time.time >= nextFireTime) // Cambiato da GetMouseButtonDown a GetMouseButton
-            {
-                Fire();
-                nextFireTime = Time.time + fireRate; // Imposta il prossimo momento in cui potrà sparare
-            }
-            
-            // Resetta l'animazione quando si rilascia il tasto
-            if (Input.GetMouseButtonUp(0) && playerAnimator != null)
-            {
-                playerAnimator.SetBool("isFiring", false);
-            }
+            HandleInput();
         }
+    }
+
+    protected virtual void HandleInput()
+    {
+        // Base implementation empty - override in derived classes
     }
 
     protected virtual void Fire()
