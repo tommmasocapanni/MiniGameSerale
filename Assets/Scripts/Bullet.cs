@@ -4,6 +4,8 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] private ParticleSystem bulletTrailEffect;
     [SerializeField] private ParticleSystem explosionEffect;
+    [SerializeField] private float bulletDamage = 20f; // Danno inflitto al colpire un NPC
+    
     private bool hasCollided = false;
     
     private void Start()
@@ -13,6 +15,13 @@ public class Bullet : MonoBehaviour
         {
             bulletTrailEffect.Play();
             Debug.Log("Trail effect started");
+        }
+        
+        // Aggiungi BulletDamage se non presente
+        if (GetComponent<BulletDamage>() == null)
+        {
+            BulletDamage damageComponent = gameObject.AddComponent<BulletDamage>();
+            damageComponent.danno = bulletDamage;
         }
     }
     
@@ -45,6 +54,7 @@ public class Bullet : MonoBehaviour
         }
 
         // Delay destruction slightly to ensure effects are visible
+        // Also allows BulletDamage to process the collision
         Destroy(gameObject, 0.1f);
     }
 }

@@ -30,6 +30,13 @@ public class SimplifiedNPC : MonoBehaviour
     public LayerMask layerOstacoli;                 // Layer degli ostacoli da evitare
     public bool disegnaSensori = false;             // Disegna i raggi di rilevamento
 
+    [Header("Sistema Vita")]
+    public float vitaMassima = 100f;
+    public float vitaAttuale;
+    public bool isDead = false;
+    public bool showHealthBar = true;
+    public GameObject bloodEffectPrefab; // Effetto sangue opzionale quando colpito
+
     [Header("Debug")]
     public bool mostraDebug = false;
     
@@ -53,6 +60,9 @@ public class SimplifiedNPC : MonoBehaviour
         animatore = GetComponent<Animator>();
         miaTrasformata = transform;
         ultimaPosizione = miaTrasformata.position;
+        
+        // Inizializza la vita
+        vitaAttuale = vitaMassima;
         
         // Verifica che i componenti necessari siano presenti
         if (agente == null || animatore == null)
@@ -113,6 +123,7 @@ public class SimplifiedNPC : MonoBehaviour
     
     private void Update()
     {
+        if (isDead) return; // Skip all updates if dead
         if (isGestendoBlocco) return;
         
         // Gestisci lo stato corrente
@@ -544,5 +555,172 @@ public class SimplifiedNPC : MonoBehaviour
         {
             animatore.speed = velocitaAnimazione;
         }
+    }
+
+    // Metodo per ricevere danno
+    public void RiceviDanno(float quantitaDanno, Vector3 puntoImpatto)
+    {
+        if (isDead) return; // Ignora il danno se già morto
+        
+        // Applica il danno
+        vitaAttuale -= quantitaDanno;
+        
+        // Verifica se l'NPC è morto
+        if (vitaAttuale <= 0)
+        {
+            Muori(puntoImpatto); // Passa il punto d'impatto al metodo Muori
+        }
+    }
+
+    // Metodo per gestire la morte
+    private void Muori(Vector3 puntoImpatto)
+    {
+        isDead = true;
+        vitaAttuale = 0;
+        
+        // Attiva il trigger di morte nell'animatore
+        animatore.SetTrigger("IsDead");
+        
+        // Mostra effetto sangue solo al momento della morte
+        if (bloodEffectPrefab != null)
+        {
+            GameObject blood = Instantiate(bloodEffectPrefab, puntoImpatto, 
+                             Quaternion.LookRotation(puntoImpatto - transform.position));
+            
+            // Distruggi l'effetto sangue dopo un tempo ragionevole
+            Destroy(blood, 2f);
+        }
+        
+        // Ferma il movimento
+        if (agente != null)
+        {
+            agente.isStopped = true;
+            agente.ResetPath();
+            agente.enabled = false; // Disabilita il NavMeshAgent completamente
+        }
+        
+        // Disattiva il movimento dell'NPC
+        this.enabled = false;
+        
+        // Gestione appropriata del collider e della fisica
+        Collider collider = GetComponent<Collider>();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        
+        if (collider != null)
+        {
+            // NON trasformare in trigger
+            // collider.isTrigger = true; <- Rimuovi/commenta questa linea
+            
+            // Opzionale: puoi regolare il centro del collider per adattarlo alla posizione del corpo caduto
+            if (collider is CapsuleCollider capsule)
+            {
+                // Adatta il collider alla posizione del corpo a terra
+                capsule.center = new Vector3(capsule.center.x, capsule.center.y / 2, capsule.center.z);
+                capsule.height = capsule.height / 2;
+            }
+        }
+        
+        // Gestione del Rigidbody per mantenere il corpo sul terreno
+        if (rb != null)
+        {
+            // Opzione 1: Mantieni il rigidbody ma blocca la posizione dopo un breve periodo
+            StartCoroutine(BloccaCorpoDopoCaduta());
+        }
+        else 
+        {
+            // Se non c'è già un Rigidbody, ne aggiungi uno per gestire la caduta correttamente
+            rb = gameObject.AddComponent<Rigidbody>();
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.isKinematic = false;
+            StartCoroutine(BloccaCorpoDopoCaduta());
+        }
+        
+        // Programma la rimozione del cadavere dopo un po' (opzionale)
+        // Invoke("RimuoviCadavere", 10f);
+    }
+
+    // Aggiorna anche questa versione senza parametri per retrocompatibilità
+    private void Muori()
+    {
+        // Usa la posizione della testa dell'NPC come punto d'impatto predefinito
+        Vector3 puntoImpatto = transform.position + Vector3.up * 1.5f;
+        Muori(puntoImpatto);
+    }
+
+    // Nuovo metodo per bloccare il corpo dopo che è caduto a terra
+    private IEnumerator BloccaCorpoDopoCaduta()
+    {
+        // Aspetta che il corpo cada a terra e si stabilizzi
+        yield return new WaitForSeconds(2f);
+        
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            // Blocca il corpo in posizione una volta caduto
+            rb.isKinematic = true;
+            
+            // Opzionale: puoi anche bloccare la rotazione
+            rb.freezeRotation = true;
+        }
+    }
+
+    // Opzionale: metodo per rimuovere il cadavere
+    private void RimuoviCadavere()
+    {
+        // Fade out e distruggi
+        StartCoroutine(FadeOutAndDestroy());
+    }
+
+    private IEnumerator FadeOutAndDestroy()
+    {
+        // Trova tutti i renderer nell'NPC
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        
+        // Fade out graduale
+        float duration = 2.0f;
+        float elapsed = 0;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float normalizedTime = elapsed / duration;
+            
+            // Applica fade a tutti i materiali
+            foreach (Renderer renderer in renderers)
+            {
+                Color color = renderer.material.color;
+                color.a = 1.0f - normalizedTime;
+                renderer.material.color = color;
+            }
+            
+            yield return null;
+        }
+        
+        // Distruggi l'oggetto
+        Destroy(gameObject);
+    }
+
+    // Per visualizzare la barra della salute sopra l'NPC
+    private void OnGUI()
+    {
+        if (!showHealthBar || isDead || vitaAttuale >= vitaMassima) return;
+        
+        // Converti la posizione del mondo in posizione dello schermo
+        Vector3 posizioneMondo = transform.position + Vector3.up * 2.2f; // Sopra la testa
+        Vector3 posizioneSchermo = Camera.main.WorldToScreenPoint(posizioneMondo);
+        
+        if (posizioneSchermo.z <= 0) return; // Ignora se dietro la camera
+        
+        // Calcola la larghezza della barra in base alla distanza
+        float distanza = Vector3.Distance(Camera.main.transform.position, transform.position);
+        float larghezza = Mathf.Clamp(100 - distanza * 2, 40, 100);
+        
+        // Disegna la barra di salute
+        GUI.color = Color.red;
+        GUI.DrawTexture(new Rect(posizioneSchermo.x - larghezza/2, Screen.height - posizioneSchermo.y, larghezza, 7), Texture2D.whiteTexture);
+        
+        GUI.color = Color.green;
+        float healthWidth = (vitaAttuale / vitaMassima) * larghezza;
+        GUI.DrawTexture(new Rect(posizioneSchermo.x - larghezza/2, Screen.height - posizioneSchermo.y, healthWidth, 7), Texture2D.whiteTexture);
     }
 }

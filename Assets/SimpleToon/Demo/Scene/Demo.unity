@@ -36633,6 +36633,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   disegnaSensori: 1
+  vitaMassima: 300
+  vitaAttuale: 0
+  isDead: 0
+  showHealthBar: 1
+  bloodEffectPrefab: {fileID: 5435998012328932994, guid: d8703a33a4eb0b84a875202fde23e8f7, type: 3}
   mostraDebug: 0
 --- !u!1 &2015163629
 GameObject:

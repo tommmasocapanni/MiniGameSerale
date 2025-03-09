@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2587181675382117401}
   - component: {fileID: 8466467989041130084}
   - component: {fileID: 4781506096422763512}
+  - component: {fileID: 4631326878324701218}
   m_Layer: 0
   m_Name: bullet
   m_TagString: Untagged
@@ -174,6 +175,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletTrailEffect: {fileID: 0}
   explosionEffect: {fileID: 5103533734002292656}
+  bulletDamage: 20
+--- !u!114 &4631326878324701218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5355664948953481417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93e637c1fb8c8407fbdaf9b184b2556d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  danno: 20
+  raggioDanno: 0
+  npcLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  impactEffectPrefab: {fileID: 0}
+  dannoVariabile: 1
+  dannoMassimo: 40
+  dannoMinimo: 10
+  distanzaMassimaDanno: 50
 --- !u!1001 &8129126925167282289
 PrefabInstance:
   m_ObjectHideFlags: 0
