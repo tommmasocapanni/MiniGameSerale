@@ -35888,6 +35888,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClaudinoCharacterNPC
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e9c96c7b5ef4d4a7bae08e694d31f481, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -35906,10 +35910,10 @@ PrefabInstance:
       addedObject: {fileID: 2014233227}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9c96c7b5ef4d4a7bae08e694d31f481, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2014233226}
+      addedObject: {fileID: 2014233228}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9c96c7b5ef4d4a7bae08e694d31f481, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2014233228}
+      addedObject: {fileID: 2014233230}
     - targetCorrespondingSourceObject: {fileID: -686274122412533232, guid: e9c96c7b5ef4d4a7bae08e694d31f481, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1325444513}
@@ -37028,27 +37032,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.005, y: 0.01, z: 0.004}
   m_Center: {x: 0, y: 0.0051, z: 0}
---- !u!135 &2014233226
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2014233217}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 1.1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!195 &2014233227
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -37058,7 +37041,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 2014233217}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1
+  m_Radius: 0.005
   m_Speed: 150
   m_Acceleration: 0
   avoidancePriority: 50
@@ -37067,8 +37050,8 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: -0.0008
+  m_Height: 0.01
+  m_BaseOffset: -0.0002
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &2014233228
@@ -37107,6 +37090,27 @@ MonoBehaviour:
   showHealthBar: 1
   bloodEffectPrefab: {fileID: 5435998012328932994, guid: d8703a33a4eb0b84a875202fde23e8f7, type: 3}
   mostraDebug: 0
+--- !u!135 &2014233230
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014233217}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.005
+  m_Center: {x: 0, y: 0.005, z: 0}
 --- !u!1 &2015163629
 GameObject:
   m_ObjectHideFlags: 0
