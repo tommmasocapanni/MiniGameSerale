@@ -4688,7 +4688,8 @@ MonoBehaviour:
   animator: {fileID: 582747312}
   rb: {fileID: 0}
   nearCar: 0
-  car: {fileID: 731020623}
+  car: {fileID: 1357205612}
+  isInCar: 0
   ufo: {fileID: 808902300}
   ufoGlass: {fileID: 445638172}
   ufoSeatTrigger: {fileID: 719650688}
@@ -6206,6 +6207,10 @@ MonoBehaviour:
   frontRightWheel: {fileID: 443959938}
   rearLeftWheel: {fileID: 366939087}
   rearRightWheel: {fileID: 2140295665}
+  wheelBaseRotationY: -90
+  invertWheelRotation: 0
+  steeringAngleMultiplier: 20
+  useZAxisRotation: 0
   seatTrigger: {fileID: 1270357077}
   cameraTransform: {fileID: 961739753}
   cameraOffset: {x: 0, y: 1, z: 4}
@@ -20044,7 +20049,7 @@ Transform:
   m_GameObject: {fileID: 1292622038}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000001545431, y: -0.7071068, z: -0.00000001545431, w: 0.7071068}
-  m_LocalPosition: {x: 0.10339999, y: -0.055, z: -0.083}
+  m_LocalPosition: {x: 0.1, y: -0.13, z: -0.12}
   m_LocalScale: {x: 1.5000001, y: 1.5, z: 1.5000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25501,11 +25506,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.712
+      value: 0.797
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.106932
+      value: -7.852
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -25575,6 +25580,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1357205622}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1357205629}
     - targetCorrespondingSourceObject: {fileID: 4332383992470388848, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1357205624}
@@ -25691,7 +25699,11 @@ MonoBehaviour:
   frontRightWheel: {fileID: 1357205617}
   rearLeftWheel: {fileID: 1357205615}
   rearRightWheel: {fileID: 1357205613}
-  seatTrigger: {fileID: 1270357077}
+  wheelBaseRotationY: 0
+  invertWheelRotation: 0
+  steeringAngleMultiplier: 10
+  useZAxisRotation: 1
+  seatTrigger: {fileID: 1292622039}
   cameraTransform: {fileID: 961739753}
   cameraOffset: {x: 0, y: 1, z: 4}
   cameraReturnSpeed: 2
@@ -25736,6 +25748,27 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -69406745482244539, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
+--- !u!65 &1357205629
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357205612}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.5, z: 0.65}
+  m_Center: {x: -0.06297609, y: 0.018487945, z: -0.0042844294}
 --- !u!64 &1357675207
 MeshCollider:
   m_ObjectHideFlags: 0
