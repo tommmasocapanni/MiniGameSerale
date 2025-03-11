@@ -21,6 +21,13 @@ public class CarController : MonoBehaviour
     public Transform rearLeftWheel;
     public Transform rearRightWheel;
 
+    [Header("Wheel Settings")]
+    [SerializeField] private float wheelBaseRotationY = -90f; // Rotazione base delle ruote sull'asse Y
+    [SerializeField] private bool invertWheelRotation = false; // Per invertire la rotazione se necessario
+    [SerializeField] private float steeringAngleMultiplier = 10f; // Moltiplicatore per l'angolo di sterzata
+    [SerializeField] private bool useZAxisRotation = false; // Per ruotare sull'asse Z invece che X
+    private float frontWheelsRotation = 0f; // Rinominato per essere più generico
+
     [Header("Car Components")]
     public Transform seatTrigger;
     public Transform cameraTransform;
@@ -59,7 +66,6 @@ public class CarController : MonoBehaviour
     private float cameraRotationX = 0f;
     private float cameraRotationY = 0f;
     private float currentSpeed = 0f;
-    private float frontWheelsRotationX = 0f; // Add this with other private variables
 
     private void Start()
     {
@@ -80,11 +86,11 @@ public class CarController : MonoBehaviour
 
     private void SetInitialWheelRotations()
     {
-        // Set default -90 degrees Y rotation for all wheels
-        frontLeftWheel.localRotation = Quaternion.Euler(0, -90, 0);
-        frontRightWheel.localRotation = Quaternion.Euler(0, -90, 0);
-        rearLeftWheel.localRotation = Quaternion.Euler(0, -90, 0);
-        rearRightWheel.localRotation = Quaternion.Euler(0, -90, 0);
+        // Set base Y rotation for all wheels
+        frontLeftWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, 0);
+        frontRightWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, 0);
+        rearLeftWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, 0);
+        rearRightWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, 0);
     }
 
     private void FixedUpdate()
@@ -248,22 +254,40 @@ public class CarController : MonoBehaviour
 
     private void RotateWheels()
     {
-        float wheelRotation = currentSpeed * 360 * Time.fixedDeltaTime;
+        float wheelRotation = currentSpeed * 360 * Time.fixedDeltaTime * (invertWheelRotation ? -1 : 1);
         
-        // Update accumulated X rotation
-        frontWheelsRotationX += wheelRotation;
+        // Update accumulated rotation
+        frontWheelsRotation += wheelRotation;
         
-        // Rotate all wheels around their local X axis
-        rearLeftWheel.Rotate(wheelRotation, 0, 0, Space.Self);
-        rearRightWheel.Rotate(wheelRotation, 0, 0, Space.Self);
+        // Prepare the rotation vectors based on the selected axis
+        Vector3 rollingAxis = useZAxisRotation ? new Vector3(0, 0, 1) : new Vector3(1, 0, 0);
+        
+        // Rotate rear wheels (only rolling motion)
+        if (useZAxisRotation)
+        {
+            rearLeftWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, frontWheelsRotation);
+            rearRightWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY, frontWheelsRotation);
+        }
+        else
+        {
+            rearLeftWheel.localRotation = Quaternion.Euler(frontWheelsRotation, wheelBaseRotationY, 0);
+            rearRightWheel.localRotation = Quaternion.Euler(frontWheelsRotation, wheelBaseRotationY, 0);
+        }
 
         // Calculate steering angle
-        float steerAngle = horizontalInput * 10f; // 10 degrees max steering
+        float steerAngle = horizontalInput * steeringAngleMultiplier;
 
-        // Apply rotation to front wheels using Quaternion
-        Quaternion frontWheelRotation = Quaternion.Euler(frontWheelsRotationX, -90 + steerAngle, 0);
-        frontLeftWheel.localRotation = frontWheelRotation;
-        frontRightWheel.localRotation = frontWheelRotation;
+        // Apply rotation to front wheels (rolling + steering)
+        if (useZAxisRotation)
+        {
+            frontLeftWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY + steerAngle, frontWheelsRotation);
+            frontRightWheel.localRotation = Quaternion.Euler(0, wheelBaseRotationY + steerAngle, frontWheelsRotation);
+        }
+        else
+        {
+            frontLeftWheel.localRotation = Quaternion.Euler(frontWheelsRotation, wheelBaseRotationY + steerAngle, 0);
+            frontRightWheel.localRotation = Quaternion.Euler(frontWheelsRotation, wheelBaseRotationY + steerAngle, 0);
+        }
     }
 
     private void ApplyDownforce()
@@ -414,15 +438,14 @@ public class CarController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isPlayerInCar)
         {
             PlayerController pc = other.GetComponent<PlayerController>();
-            if (pc != null && !isPlayerInCar)  // Controlla se la macchina è già occupata
+            if (pc != null && !pc.IsInAnyCar())
             {
                 Debug.Log("OnTriggerEnter: Player near car");
                 pc.nearCar = true;
                 pc.car = gameObject;
-                // Non settare playerController qui, lo facciamo solo quando entra effettivamente
             }
         }
     }
@@ -432,7 +455,7 @@ public class CarController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             PlayerController pc = other.GetComponent<PlayerController>();
-            if (pc != null && pc != playerController)  // Non resettare se è il player che sta guidando
+            if (pc != null && pc.car == gameObject)
             {
                 Debug.Log("OnTriggerExit: Player left car area");
                 pc.nearCar = false;
@@ -459,6 +482,7 @@ public class CarController : MonoBehaviour
             
             // Riattiva tutti i controlli del player
             playerController.enabled = true;
+            playerController.isInCar = false; // Resetta esplicitamente lo stato del player
             
             // Disattiva animazione di guida
             playerController.animator.SetBool("isDriving", false);
@@ -466,21 +490,16 @@ public class CarController : MonoBehaviour
             // Riattiva le collisioni
             Physics.IgnoreCollision(playerController.GetComponent<Collider>(), carCollider, false);
             
-            // Mantieni il riferimento al player per permettergli di rientrare
+            // Il player rimane vicino alla macchina
             playerController.nearCar = true;
             playerController.car = gameObject;
-
-            // Non azzerare playerController qui, lo facciamo solo quando si allontana effettivamente
-            StartCoroutine(ResetPlayerControllerAfterExit());
         }
 
         rb.isKinematic = false;
         isExitingCar = false;
         
-        // Assicurati che la musica sia completamente fermata
+        // Audio e UI
         AudioManager.Instance.StopCarMusic();
-        
-        // Nascondi la UI della musica
         MusicUIController.Instance.ShowMusicUI(false);
     }
 

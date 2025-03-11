@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     private Jetpack jetpack;
     public bool nearCar = false; // Make this field public
     public GameObject car; // Make this field public
-    private bool isInCar = false;
+    public bool isInCar = false; // Cambiato da private a public
     private bool isExitingCar = false;
 
     public GameObject ufo; // Reference to the UFO
@@ -232,11 +232,11 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Car"))
+        if (other.CompareTag("Car") && !isInCar)
         {
             Debug.Log("Player entered car trigger");
             nearCar = true;
-            car = other.gameObject;
+            car = other.transform.parent.gameObject; // Prendi il parent del trigger
         }
 
         if (other.CompareTag("UFO"))
@@ -281,9 +281,9 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator EnterCarCoroutine()
     {
-        if (car == null)
+        if (car == null || isInCar)
         {
-            Debug.LogError("Car reference is null!");
+            Debug.LogError("Can't enter car: " + (car == null ? "no car reference" : "already in car"));
             yield break;
         }
 
@@ -294,27 +294,19 @@ public class PlayerController : MonoBehaviour
             yield break;
         }
 
-        if (!isInCar)
-        {
-            isInCar = true;
-            Debug.Log("Starting car enter sequence");
-            
-            // Riattiva questa riga per disabilitare il controller durante la guida
-            enabled = false;
-            rb.isKinematic = true;
-            
-            animator.SetBool("isDriving", true);
-            
-            // Aggiungi questa linea per far partire la musica
-            AudioManager.Instance.StartCarMusic();
-            
-            // Mostra la UI della musica
-            MusicUIController.Instance.ShowMusicUI(true);
-            
-            yield return new WaitForSeconds(0.1f);
-            
-            carController.EnterCar(this);
-        }
+        isInCar = true;
+        Debug.Log("Starting car enter sequence");
+        
+        enabled = false;
+        rb.isKinematic = true;
+        animator.SetBool("isDriving", true);
+        
+        AudioManager.Instance.StartCarMusic();
+        MusicUIController.Instance.ShowMusicUI(true);
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        carController.EnterCar(this);
     }
 
     private IEnumerator EnterUFO()
@@ -482,5 +474,10 @@ public class PlayerController : MonoBehaviour
             // Ora espelli il jetpack
             jetpackToRemove.ForceEject();
         }
+    }
+
+    public bool IsInAnyCar()
+    {
+        return isInCar;
     }
 }
