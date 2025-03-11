@@ -13,7 +13,6 @@ public class CarController : MonoBehaviour
     public float jumpCooldown = 1f;  // Tempo di attesa tra i salti
     public LayerMask groundLayer; // Per il ground check
     private bool canJump = true;     // Flag per il cooldown del salto
-    private bool isGrounded;         // Flag per verificare se la macchina è a terra
 
     [Header("Wheel Transforms")]
     public Transform frontLeftWheel;
@@ -22,11 +21,11 @@ public class CarController : MonoBehaviour
     public Transform rearRightWheel;
 
     [Header("Wheel Settings")]
-    [SerializeField] private float wheelBaseRotationY = -90f; // Rotazione base delle ruote sull'asse Y
-    [SerializeField] private bool invertWheelRotation = false; // Per invertire la rotazione se necessario
-    [SerializeField] private float steeringAngleMultiplier = 10f; // Moltiplicatore per l'angolo di sterzata
-    [SerializeField] private bool useZAxisRotation = false; // Per ruotare sull'asse Z invece che X
-    private float frontWheelsRotation = 0f; // Rinominato per essere più generico
+    [SerializeField] protected float wheelBaseRotationY = -90f; // Rotazione base delle ruote sull'asse Y
+    [SerializeField] protected bool invertWheelRotation = false; // Per invertire la rotazione se necessario
+    [SerializeField] protected float steeringAngleMultiplier = 10f; // Moltiplicatore per l'angolo di sterzata
+    [SerializeField] protected bool useZAxisRotation = false; // Per ruotare sull'asse Z invece che X
+    protected float frontWheelsRotation = 0f; // Rinominato per essere più generico
 
     [Header("Car Components")]
     public Transform seatTrigger;
@@ -56,18 +55,19 @@ public class CarController : MonoBehaviour
     private int driftDirection = 0;
     private int driftLevel = 0;
 
-    private float horizontalInput, verticalInput;
-    private bool isBreaking;
-    private PlayerController playerController;
-    private bool isPlayerInCar = false;
-    private bool isExitingCar = false;
-    private Rigidbody rb;
-    private Collider carCollider;
-    private float cameraRotationX = 0f;
-    private float cameraRotationY = 0f;
-    private float currentSpeed = 0f;
+    protected float horizontalInput, verticalInput;
+    protected bool isBreaking;
+    protected PlayerController playerController;
+    protected bool isPlayerInCar = false;
+    protected bool isExitingCar = false;
+    protected Rigidbody rb;
+    protected Collider carCollider;
+    protected float cameraRotationX = 0f;
+    protected float cameraRotationY = 0f;
+    protected float currentSpeed = 0f;
+    protected bool isGrounded;
 
-    private void Start()
+    protected virtual void Start()
     {
         rb = GetComponent<Rigidbody>();
         carCollider = GetComponent<Collider>();
@@ -195,7 +195,7 @@ public class CarController : MonoBehaviour
         }
     }
 
-    private void HandleMovement()
+    protected virtual void HandleMovement()
     {
         if (isBreaking)
         {
@@ -252,7 +252,7 @@ public class CarController : MonoBehaviour
         }
     }
 
-    private void RotateWheels()
+    protected virtual void RotateWheels()
     {
         float wheelRotation = currentSpeed * 360 * Time.fixedDeltaTime * (invertWheelRotation ? -1 : 1);
         
@@ -397,7 +397,7 @@ public class CarController : MonoBehaviour
         return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
 
-    public void EnterCar(PlayerController player)
+    public virtual void EnterCar(PlayerController player)
     {
         if (player == null)
         {
@@ -436,7 +436,7 @@ public class CarController : MonoBehaviour
         transform.rotation = seatTrigger.rotation;
     }
 
-    void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !isPlayerInCar)
         {
@@ -445,26 +445,26 @@ public class CarController : MonoBehaviour
             {
                 Debug.Log("OnTriggerEnter: Player near car");
                 pc.nearCar = true;
-                pc.car = gameObject;
+                pc.nearestCar = gameObject;
             }
         }
     }
 
-    void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             PlayerController pc = other.GetComponent<PlayerController>();
-            if (pc != null && pc.car == gameObject)
+            if (pc != null && pc.nearestCar == gameObject)
             {
                 Debug.Log("OnTriggerExit: Player left car area");
                 pc.nearCar = false;
-                pc.car = null;
+                pc.nearestCar = null;
             }
         }
     }
 
-    public void ExitCar()
+    public virtual void ExitCar()
     {
         if (isExitingCar) return;
         isExitingCar = true;
@@ -492,7 +492,7 @@ public class CarController : MonoBehaviour
             
             // Il player rimane vicino alla macchina
             playerController.nearCar = true;
-            playerController.car = gameObject;
+            playerController.nearestCar = gameObject;
         }
 
         rb.isKinematic = false;
@@ -505,20 +505,17 @@ public class CarController : MonoBehaviour
 
     private IEnumerator ResetPlayerControllerAfterExit()
     {
-        // Aspetta un frame per assicurarci che tutti i trigger siano stati processati
         yield return new WaitForFixedUpdate();
         
-        // Se il player è ancora nel trigger della macchina, non resettare nulla
         if (playerController != null && playerController.nearCar)
         {
             yield break;
         }
         
-        // Altrimenti, resetta i riferimenti
         if (playerController != null)
         {
             playerController.nearCar = false;
-            playerController.car = null;
+            playerController.nearestCar = null;
             playerController = null;
         }
     }

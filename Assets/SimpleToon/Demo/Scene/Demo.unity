@@ -1355,9 +1355,6 @@ PrefabInstance:
       addedObject: {fileID: 582747315}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 582747317}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 582747318}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
       insertIndex: -1
@@ -4688,7 +4685,7 @@ MonoBehaviour:
   animator: {fileID: 582747312}
   rb: {fileID: 0}
   nearCar: 0
-  car: {fileID: 1357205612}
+  nearestCar: {fileID: 0}
   isInCar: 0
   ufo: {fileID: 808902300}
   ufoGlass: {fileID: 445638172}
@@ -4720,28 +4717,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!64 &582747317
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 582747310}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 1813106279528136658, guid: 61eaaa723af554670af4a7709c608b59, type: 3}
 --- !u!65 &582747318
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20049,7 +20024,7 @@ Transform:
   m_GameObject: {fileID: 1292622038}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000001545431, y: -0.7071068, z: -0.00000001545431, w: 0.7071068}
-  m_LocalPosition: {x: 0.1, y: -0.13, z: -0.12}
+  m_LocalPosition: {x: 0.1, y: -0.07, z: -0.01}
   m_LocalScale: {x: 1.5000001, y: 1.5, z: 1.5000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25506,7 +25481,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.797
+      value: 1.741
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -25556,6 +25531,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: macchinina-benny
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
+      propertyPath: m_TagString
+      value: Car
+      objectReference: {fileID: 0}
     - target: {fileID: 4332383992470388848, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       propertyPath: m_Name
       value: Kart-Wheel.Ft.L
@@ -25576,13 +25555,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1357205623}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1357205622}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1357205629}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1357205630}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1357205631}
     - targetCorrespondingSourceObject: {fileID: 4332383992470388848, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1357205624}
@@ -25673,59 +25655,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1357205623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1357205612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55c80eba2601043a4a7c9ff77fce3fc6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  motorForce: 6
-  maxSpeed: 10
-  turnSpeed: 100
-  brakeForce: 6
-  downForce: 2
-  jumpForce: 1000
-  jumpCooldown: 1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  frontLeftWheel: {fileID: 1357205619}
-  frontRightWheel: {fileID: 1357205617}
-  rearLeftWheel: {fileID: 1357205615}
-  rearRightWheel: {fileID: 1357205613}
-  wheelBaseRotationY: 0
-  invertWheelRotation: 0
-  steeringAngleMultiplier: 10
-  useZAxisRotation: 1
-  seatTrigger: {fileID: 1292622039}
-  cameraTransform: {fileID: 961739753}
-  cameraOffset: {x: 0, y: 1, z: 4}
-  cameraReturnSpeed: 2
-  cameraRotationSpeed: 2
-  cameraTurnEffect: 0.5
-  cameraYawOffset: 180
-  cameraPitchOffset: 1
-  driftPowerGain: 2
-  driftSteeringMultiplier: 2
-  driftColors:
-  - {r: 1, g: 0.92156863, b: 0.011764706, a: 1}
-  - {r: 0.1266487, g: 1, b: 0.015686274, a: 1}
-  - {r: 0.94275093, g: 0, b: 1, a: 1}
-  driftLevelThresholds:
-  - 0
-  - 2
-  - 4
-  wheelParticles:
-  - {fileID: 2100290304}
-  - {fileID: 2035047078}
-  - {fileID: 1377149425}
-  - {fileID: 1332444424}
 --- !u!64 &1357205624
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -25769,6 +25698,77 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 0.65}
   m_Center: {x: -0.06297609, y: 0.018487945, z: -0.0042844294}
+--- !u!114 &1357205630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357205612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85ec31208cc86ee468f9402f33dfd85d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  motorForce: 6
+  maxSpeed: 10
+  turnSpeed: 100
+  brakeForce: 6
+  downForce: 2
+  jumpForce: 1000
+  jumpCooldown: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  frontLeftWheel: {fileID: 1357205619}
+  frontRightWheel: {fileID: 1357205617}
+  rearLeftWheel: {fileID: 1357205615}
+  rearRightWheel: {fileID: 1357205613}
+  wheelBaseRotationY: 0
+  invertWheelRotation: 0
+  steeringAngleMultiplier: 20
+  useZAxisRotation: 1
+  seatTrigger: {fileID: 1292622039}
+  cameraTransform: {fileID: 961739753}
+  cameraOffset: {x: 0, y: 1, z: 4}
+  cameraReturnSpeed: 2
+  cameraRotationSpeed: 2
+  cameraTurnEffect: 0.5
+  cameraYawOffset: 180
+  cameraPitchOffset: 1
+  driftPowerGain: 2
+  driftSteeringMultiplier: 2
+  driftColors:
+  - {r: 0, g: 1, b: 0.845238, a: 1}
+  - {r: 1, g: 0, b: 0.5568628, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  driftLevelThresholds:
+  - 2
+  - 4
+  - 6
+  wheelParticles: []
+--- !u!64 &1357205631
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357205612}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5286216025493079669, guid: 10b8967d9e7fe684c8cbee39e85afdeb, type: 3}
 --- !u!64 &1357675207
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     private float yRotation = 0f;
     private Jetpack jetpack;
     public bool nearCar = false; // Make this field public
-    public GameObject car; // Make this field public
+    public GameObject nearestCar; // Changed back to public for CarController access
     public bool isInCar = false; // Cambiato da private a public
     private bool isExitingCar = false;
 
@@ -36,6 +36,23 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen
+
+        // Configura il mesh collider correttamente
+        MeshCollider meshCollider = GetComponent<MeshCollider>();
+        if (meshCollider != null)
+        {
+            meshCollider.convex = true; // Rendi il mesh collider convex
+            meshCollider.enabled = false; // Disabilita il mesh collider
+        }
+
+        // Assicurati che ci sia un box collider per la fisica
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        if (boxCollider == null)
+        {
+            boxCollider = gameObject.AddComponent<BoxCollider>();
+            boxCollider.center = new Vector3(0, 1, 0); // Centra il collider
+            boxCollider.size = new Vector3(0.5f, 2f, 0.5f); // Dimensioni appropriate per il personaggio
+        }
     }
 
     void Update()
@@ -160,7 +177,7 @@ public class PlayerController : MonoBehaviour
         // Check for interaction with car
         if (nearCar && Input.GetKeyDown(KeyCode.E) && !isInCar)  // Aggiunto check !isInCar
         {
-            if (car != null)
+            if (nearestCar != null)
             {
                 Debug.Log("Attempting to enter car");
                 StartCoroutine(EnterCarCoroutine());
@@ -236,7 +253,7 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Player entered car trigger");
             nearCar = true;
-            car = other.transform.parent.gameObject; // Prendi il parent del trigger
+            nearestCar = other.transform.parent.gameObject;
         }
 
         if (other.CompareTag("UFO"))
@@ -257,7 +274,10 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Player exited car trigger");
                 nearCar = false;
-                car = null;
+                if (nearestCar == other.transform.parent.gameObject)
+                {
+                    nearestCar = null;
+                }
             }
         }
 
@@ -281,13 +301,13 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator EnterCarCoroutine()
     {
-        if (car == null || isInCar)
+        if (nearestCar == null || isInCar)
         {
-            Debug.LogError("Can't enter car: " + (car == null ? "no car reference" : "already in car"));
+            Debug.LogError("Can't enter car: " + (nearestCar == null ? "no car reference" : "already in car"));
             yield break;
         }
 
-        CarController carController = car.GetComponent<CarController>();
+        CarController carController = nearestCar.GetComponent<CarController>();
         if (carController == null)
         {
             Debug.LogError("CarController component not found on car!");
@@ -297,6 +317,16 @@ public class PlayerController : MonoBehaviour
         isInCar = true;
         Debug.Log("Starting car enter sequence");
         
+        // Disabilita temporaneamente il collider del player
+        Collider playerCollider = GetComponent<Collider>();
+        if (playerCollider != null)
+            playerCollider.enabled = false;
+
+        // Disabilita solo il box collider durante la guida
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        if (boxCollider != null)
+            boxCollider.enabled = false;
+            
         enabled = false;
         rb.isKinematic = true;
         animator.SetBool("isDriving", true);
@@ -304,9 +334,18 @@ public class PlayerController : MonoBehaviour
         AudioManager.Instance.StartCarMusic();
         MusicUIController.Instance.ShowMusicUI(true);
         
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f); // Aumentato il delay
+        
+        // Riposiziona il player correttamente
+        transform.position = carController.seatTrigger.position;
+        transform.rotation = carController.seatTrigger.rotation;
         
         carController.EnterCar(this);
+        
+        // Riattiva il collider dopo un breve delay
+        yield return new WaitForSeconds(0.1f);
+        if (playerCollider != null)
+            playerCollider.enabled = true;
     }
 
     private IEnumerator EnterUFO()
@@ -385,6 +424,11 @@ public class PlayerController : MonoBehaviour
         isExitingCar = true;
         isInCar = false;
         
+        // Riattiva il box collider
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        if (boxCollider != null)
+            boxCollider.enabled = true;
+        
         // Ferma completamente la musica quando esci dalla macchina
         AudioManager.Instance.StopCarMusic();
         
@@ -405,9 +449,7 @@ public class PlayerController : MonoBehaviour
         // Ripristina la camera alla vista del character
         UpdateCameraForCharacter();
         
-        car.GetComponent<CarController>().ExitCar();
-        // Non azzeriamo più il riferimento alla macchina
-        // car = null; // Rimuovi questa linea
+        nearestCar.GetComponent<CarController>().ExitCar();
         nearCar = true; // Manteniamo lo stato "vicino alla macchina"
         isExitingCar = false;
     }
